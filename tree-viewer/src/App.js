@@ -50,7 +50,10 @@ class NodeViewer extends React.Component {
 				<div>Modification date: {this.props.node.modificationDate}</div>
 				<div>Content: {this.props.node.content}</div>
 			</div>);
-			return currentViewer;
+		}else if(this.props.node && this.props.node.isDir){
+			currentViewer = (<div style={style.base}>
+				<div>Size: {this.props.node.size}</div>
+			</div>);
 		}
 		return currentViewer;
         //let location = this.props.node && this.props.node.parent  ? this.props.node.parent + this.props.node.name : "";
@@ -90,11 +93,9 @@ class TreeExample extends React.Component {
 
     }
     onToggle(node, toggled){
-        if(!node.isDirectory){
-			if(this.state.cursor){this.state.cursor.active = false};
-        	node.active = true;
-			this.setState({ cursor: node });
-		}
+		if(this.state.cursor){this.state.cursor.active = false};
+        node.active = true;
+		this.setState({ cursor: node });
         if(node.children){ node.toggled = toggled; }
     }
     handleInputChange(event) {
