@@ -8,6 +8,13 @@ export default{
 		let files = post(apiUrl+'ls', {'email': email});
 		console.log(files);
 		return files;
+	},
+	cd: function(email, path){
+		 post(apiUrl+'cd', {'email': email, "path":path});
+		return;
+	},
+	touch: function(email, fileName, content){
+		 return post(apiUrl+'createFile', {'email': email, "fileName":fileName, "content":content});
 	}
 }
 

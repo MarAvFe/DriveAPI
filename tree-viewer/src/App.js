@@ -75,16 +75,7 @@ var data = {
 	loading: true
 }
 
-//class Move extends React.Component {
-//	render(){
-//		return (
-//			<div>
-//				<div>Seleccione la carpeta de destino</div>
-//				<button type="button">Mover</button>
-//			</div>
-//		)
-//	}
-//}
+const mail = "my@mail.com";
 
 class TreeExample extends React.Component {
     constructor(props){
@@ -100,24 +91,28 @@ class TreeExample extends React.Component {
         this.share = this.share.bind(this);
         this.mov = this.mov.bind(this);
         this.requestMove = this.requestMove.bind(this);
+        this.requestTouch = this.requestTouch.bind(this);
         this.cancel = this.cancel.bind(this);
         this.copy = this.copy.bind(this);
 
 		this.refresh();
     }
 	refresh(){
-		xDrive.ls("my@mail.com").then((response) => {
+		xDrive.ls(mail).then((response) => {
 			data = response.data;
 			data.toggled = true;
 			DataMiddleware.json(data);
 			this.forceUpdate();
 			console.log(data);
 		});
+	xDrive.cd(mail, "/");
+
 	}
     onToggle(node, toggled){
 		if(this.state.cursor){this.state.cursor.active = false};
         node.active = true;
 		this.setState({ cursor: node });
+		xDrive.cd(mail, node.isDir ? node.parent + node.name: node.parent);
         if(node.children){ node.toggled = toggled; }
     }
     handleInputChange(event) {
@@ -129,7 +124,32 @@ class TreeExample extends React.Component {
           [name]: value
         });
       }
-    crefil(){console.log("crefil:" + this.state.cre1 + ", " + this.state.cre2)}
+    crefil(){
+		let viewerDialog = (
+			<div>
+				<div>Nombre del archivo</div>
+				<input value={this.state.inputValue1} type="text" class="form-control" onChange={evt => this.updateInputValue1(evt)}/>
+				<div>Contenido del archivo</div>
+				<input value={this.state.inputValue2} type="text" class="form-control" onChange={evt => this.updateInputValue2(evt)}/>
+				<button type="button" class="btn" onClick={this.requestTouch}>Crear</button>
+				<button type="button" class="btn" onClick={this.cancel}>Cancelar</button>
+			</div>
+			);
+			this.setState({ priority: true, dialog: viewerDialog });
+	}
+	requestTouch(){
+		xDrive.touch(mail, this.state.inputValue1, this.state.inputValue2).then(() => this.refresh());
+	}
+	updateInputValue1(evt) {
+    	this.setState({
+      		inputValue1: evt.target.value
+    	});
+  	}
+	updateInputValue2(evt) {
+    	this.setState({
+      		inputValue2: evt.target.value
+    	});
+  	}
     credir(){console.log("credir:" + this.state.dir1)}
     edit(){console.log("edit:" + this.state.edit)}
     delet(){console.log("delete:" + this.state.delet)}
@@ -149,7 +169,6 @@ class TreeExample extends React.Component {
 	}
     copy(){console.log("copy:" + this.state.copy);}
 	cancel(){
-		console.log("whoa");
 		this.setState({ priority: false});
 	}
     render(){
@@ -157,19 +176,13 @@ class TreeExample extends React.Component {
 			<StyleRoot>
             <div style={styles.component}>
             <ul>
-            <li style={styles.actions} onClick={this.crefil}>Crear archivo (nombre | contenido)</li>
-                <input name="cre1" onChange={this.handleInputChange}></input>
-                <input name="cre2" onChange={this.handleInputChange}></input>
-            <li style={styles.actions} onClick={this.credir}>Crear directorio (nombre)</li>
-                <input name="dir1" onChange={this.handleInputChange}></input>
-            <li style={styles.actions} onClick={this.edit}>Editar (Nuevo nombre)</li>
-                <input name="edit" onChange={this.handleInputChange}></input>
+            <li style={styles.actions} onClick={this.crefil}>Crear archivo</li>
+            <li style={styles.actions} onClick={this.credir}>Crear directorio </li>
+            <li style={styles.actions} onClick={this.edit}>Editar</li>
             <li style={styles.actions} onClick={this.delet}>Eliminar</li>
-            <li style={styles.actions} onClick={this.share}>Compartir (Email Destinatario)</li>
-                <input name="share" onChange={this.handleInputChange}></input>
-            <li style={styles.actions} onClick={this.mov}>Mover (Nueva Ruta)</li>
-            <li style={styles.actions} onClick={this.copy}>Copiar (Nueva Ruta)</li>
-                <input name="copy" onChange={this.handleInputChange}></input>
+            <li style={styles.actions} onClick={this.share}>Compartir</li>
+            <li style={styles.actions} onClick={this.mov}>Mover</li>
+            <li style={styles.actions} onClick={this.copy}>Copiar</li>
             </ul>
             </div>
 			<div style={styles.component}>
