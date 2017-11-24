@@ -97,18 +97,18 @@ public class FileSystemInterface {
 		ArrayList<User> users = FileSystemInterface.readDrive();
 		for (User user : users) {
 			if(user.getEmail().equals(userEmail)) {
-				DriveFile d = (DriveFile) user.getCurrentDirectory().getReference(name);
-				if(d == null) return "File not found.";
-				d.setContent(content);
-				d.setModificationDate(new Date());
-				if(user.getRoot().getSize() + content.length() < user.getDriveSize() ) {
-					user.getCurrentDirectory().getContent().put(name,d);
-					user.getCurrentDirectory().updateSize();
-				}else {
-					return "Not enough space for new file.";
+					DriveFile d = (DriveFile) user.getCurrentDirectory().getReference(name);
+					if(d == null) return "File not found.";
+					d.setContent(content);
+					d.setModificationDate(new Date());
+					if(user.getRoot().getSize() + content.length() < user.getDriveSize() ) {
+						user.getCurrentDirectory().getContent().put(name,d);
+						user.getCurrentDirectory().updateSize();
+					}else {
+						return "Not enough space for new file.";
+					}
 				}
 			}
-		}
 		saveDrive(users);
 		return "Success";
 	}
@@ -117,19 +117,31 @@ public class FileSystemInterface {
 		ArrayList<User> users = FileSystemInterface.readDrive();
 		for (User user : users) {
 			if(user.getEmail().equals(userEmail)) {
-				System.out.println("Copying...");
-				DriveFile d = (DriveFile) user.getCurrentDirectory().getReference(name);
-				if(d == null) return "File not found.";
-				String tmpPath = user.getWd();
-				String cd1 = FileSystemInterface.changeWorkingDirectory(userEmail, newPath);
-				if(!cd1.equals("Success")) return cd1;
-				String cf = FileSystemInterface.createFile(userEmail, d.getName(), d.getContent());
-				if(!cf.equals("Success")) {
-					FileSystemInterface.changeWorkingDirectory(userEmail, tmpPath);
-					return cf;
-				};
-				String cd2 = FileSystemInterface.changeWorkingDirectory(userEmail, tmpPath);
-				if(!cd2.equals("Success")) return cd2;
+				References r = user.getCurrentDirectory().getReference(name);
+				if(r.isDirectory()) {
+					Directory d = (Directory) r;
+					if(d == null) return "File not found.";
+					String tmpPath = user.getWd();
+					String cd1 = FileSystemInterface.changeWorkingDirectory(userEmail, newPath);
+					if(!cd1.equals("Success")) return cd1;
+					user.getCurrentDirectory().setReference(name, d);
+					saveDrive(users);
+					String cd2 = FileSystemInterface.changeWorkingDirectory(userEmail, tmpPath);
+					if(!cd2.equals("Success")) return cd2;
+				}else {					
+					DriveFile d = (DriveFile) r;
+					if(d == null) return "File not found.";
+					String tmpPath = user.getWd();
+					String cd1 = FileSystemInterface.changeWorkingDirectory(userEmail, newPath);
+					if(!cd1.equals("Success")) return cd1;
+					String cf = FileSystemInterface.createFile(userEmail, d.getName(), d.getContent());
+					if(!cf.equals("Success")) {
+						FileSystemInterface.changeWorkingDirectory(userEmail, tmpPath);
+						return cf;
+					};
+					String cd2 = FileSystemInterface.changeWorkingDirectory(userEmail, tmpPath);
+					if(!cd2.equals("Success")) return cd2;
+				}
 			}
 		}
 		return "Success";
@@ -139,20 +151,35 @@ public class FileSystemInterface {
 		ArrayList<User> users = FileSystemInterface.readDrive();
 		for (User user : users) {
 			if(user.getEmail().equals(userEmail)) {
-				DriveFile d = (DriveFile) user.getCurrentDirectory().getReference(name);
-				if(d == null) return "File not found.";
-				String tmpPath = user.getWd();
-				String cd1 = FileSystemInterface.changeWorkingDirectory(userEmail, newPath);
-				if(!cd1.equals("Success")) return cd1;
-				String cf = FileSystemInterface.createFile(userEmail, d.getName(), d.getContent());
-				if(!cf.equals("Success")) {
-					FileSystemInterface.changeWorkingDirectory(userEmail, tmpPath);
-					return cf;
-				};
-				String cd2 = FileSystemInterface.changeWorkingDirectory(userEmail, tmpPath);
-				if(!cd2.equals("Success")) return cd2;
-				String dl = FileSystemInterface.deleteFile(userEmail, name);
-				if(!dl.equals("Success")) return dl;
+				References r = user.getCurrentDirectory().getReference(name);
+				if(r.isDirectory()) {
+					Directory d = (Directory) r;
+					if(d == null) return "File not found.";
+					String tmpPath = user.getWd();
+					String cd1 = FileSystemInterface.changeWorkingDirectory(userEmail, newPath);
+					if(!cd1.equals("Success")) return cd1;
+					user.getCurrentDirectory().setReference(name, d);
+					saveDrive(users);
+					String cd2 = FileSystemInterface.changeWorkingDirectory(userEmail, tmpPath);
+					if(!cd2.equals("Success")) return cd2;
+					String dl = FileSystemInterface.deleteFile(userEmail, name);
+					if(!dl.equals("Success")) return dl;
+				}else {					
+					DriveFile d = (DriveFile) user.getCurrentDirectory().getReference(name);
+					if(d == null) return "File not found.";
+					String tmpPath = user.getWd();
+					String cd1 = FileSystemInterface.changeWorkingDirectory(userEmail, newPath);
+					if(!cd1.equals("Success")) return cd1;
+					String cf = FileSystemInterface.createFile(userEmail, d.getName(), d.getContent());
+					if(!cf.equals("Success")) {
+						FileSystemInterface.changeWorkingDirectory(userEmail, tmpPath);
+						return cf;
+					};
+					String cd2 = FileSystemInterface.changeWorkingDirectory(userEmail, tmpPath);
+					if(!cd2.equals("Success")) return cd2;
+					String dl = FileSystemInterface.deleteFile(userEmail, name);
+					if(!dl.equals("Success")) return dl;
+				}
 			}
 		}
 		return "Success";
@@ -193,7 +220,7 @@ public class FileSystemInterface {
 					if(entry.getKey().equals(fileName)) {
 						for (User their : users) {
 							if(their.getEmail().equals(theirEmail)) {
-								SharedFile sf = new SharedFile(userEmail, user.getCurrentDirectory().getPath() + "/" + fileName + "." + ((DriveFile)entry.getValue()).getExtension());
+								SharedFile sf = new SharedFile(userEmail, user.getCurrentDirectory().getPath() + "/" + fileName);
 								their.getSharedFiles().add(sf);
 								themFound = true;
 							}

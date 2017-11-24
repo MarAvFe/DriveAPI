@@ -78,7 +78,7 @@ public class DriveAPI {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 	public Response modifyFile(@FormParam("email") String email, @FormParam("fileName") String fileName, @FormParam("content") String content) {
-		String res = FileSystemInterface.modifyFile(email, fileName, content);
+		String res = FileSystemInterface.modifyFile(email, fileName, (content!=null ? content : ""));
 		return Response.status(200).entity(buildJson(res,!res.equals("Success")))
 				.header("Access-Control-Allow-Origin", "*")
 				.header("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT")
