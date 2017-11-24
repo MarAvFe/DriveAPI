@@ -14,104 +14,161 @@ import com.operativos.driveHandler.*;
 public class DriveAPI {
 
 	@POST
-    @Path("/sum")
+	@Path("/sum")
 	@Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 	public Response getMsg(@FormParam("msg") String msg) {
 		String output = "Jersey say : " + msg;
-		return Response.status(200).entity(buildJson(output,false)).build();
+		return Response.status(200).entity(buildJson(output,false))
+				.header("Access-Control-Allow-Origin", "*")
+				.header("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT")
+				.build();
 	}
 
 	@POST
-    @Path("/resetDrive")
+	@Path("/resetDrive")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response restResetDrive() {
 		FileSystemInterface.createDrive();
-		return Response.status(200).entity(buildJson("Success",false)).build();
+		return Response.status(200).entity(buildJson("Success",false))
+				.header("Access-Control-Allow-Origin", "*")
+				.header("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT")
+				.build();
 	}
 
 	@POST
-    @Path("/addUser")
+	@Path("/addUser")
 	@Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 	public Response addUser(@FormParam("email") String email, @FormParam("pwd") String pwd, @FormParam("driveSize") String driveSize) {
 		int size = Integer.parseInt(driveSize);
 		String res = FileSystemInterface.addUser(email, pwd, size);
-		return Response.status(200).entity(buildJson(res,!res.equals("Success"))).build();
+		return Response.status(200).entity(buildJson(res,!res.equals("Success")))
+				.header("Access-Control-Allow-Origin", "*")
+				.header("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT")
+				.build();
 	}
 
 	@POST
-    @Path("/login")
+	@Path("/login")
 	@Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 	public Response login(@FormParam("email") String email, @FormParam("pwd") String pwd) {
 		boolean res = FileSystemInterface.login(email, pwd);
-		return Response.status(200).entity(buildJson("-",!res)).build();
+		return Response.status(200).entity(buildJson("-",!res))
+				.header("Access-Control-Allow-Origin", "*")
+				.header("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT")
+				.build();
 	}
 
 	@POST
-    @Path("/createFile")
+	@Path("/createFile")
 	@Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 	public Response createFile(@FormParam("email") String email, @FormParam("fileName") String fileName, @FormParam("content") String content) {
 		String res = FileSystemInterface.createFile(email, fileName, content);
-		return Response.status(200).entity(buildJson(res,!res.equals("Success"))).build();
+		return Response.status(200).entity(buildJson(res,!res.equals("Success")))
+				.header("Access-Control-Allow-Origin", "*")
+				.header("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT")
+				.build();
 	}
 
 	@POST
-    @Path("/modifyFile")
+	@Path("/modifyFile")
 	@Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 	public Response modifyFile(@FormParam("email") String email, @FormParam("fileName") String fileName, @FormParam("content") String content) {
 		String res = FileSystemInterface.modifyFile(email, fileName, content);
-		return Response.status(200).entity(buildJson(res,!res.equals("Success"))).build();
+		return Response.status(200).entity(buildJson(res,!res.equals("Success")))
+				.header("Access-Control-Allow-Origin", "*")
+				.header("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT")
+				.build();
 	}
 
 	@POST
-    @Path("/deleteFile")
+	@Path("/moveFile")
 	@Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+	public Response moveFile(@FormParam("email") String email, @FormParam("fileName") String fileName, @FormParam("newPath") String newPath) {
+		String res = FileSystemInterface.moveFile(email, fileName, newPath);
+		return Response.status(200).entity(buildJson(res,!res.equals("Success")))
+				.header("Access-Control-Allow-Origin", "*")
+				.header("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT")
+				.build();
+	}
+
+	@POST
+	@Path("/copyFile")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+	public Response copyFile(@FormParam("email") String email, @FormParam("fileName") String fileName, @FormParam("newPath") String newPath) {
+		String res = FileSystemInterface.copyFile(email, fileName, newPath);
+		return Response.status(200).entity(buildJson(res,!res.equals("Success")))
+				.header("Access-Control-Allow-Origin", "*")
+				.header("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT")
+				.build();
+	}
+
+	@POST
+	@Path("/deleteFile")
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 	public Response deleteFile(@FormParam("email") String email, @FormParam("fileName") String fileName) {
 		String res = FileSystemInterface.deleteFile(email, fileName);
-		return Response.status(200).entity(buildJson(res,!res.equals("Success"))).build();
+		return Response.status(200).entity(buildJson(res,!res.equals("Success")))
+				.header("Access-Control-Allow-Origin", "*")
+				.header("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT")
+				.build();
 	}
 
 	@POST
-    @Path("/shareFile")
+	@Path("/shareFile")
 	@Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 	public Response shareFile(@FormParam("email") String email, @FormParam("fileName") String fileName, @FormParam("theirMail") String theirMail) {
 		String res = FileSystemInterface.shareFile(email, fileName, theirMail);
-		return Response.status(200).entity(buildJson(res,!res.equals("Success"))).build();
+		return Response.status(200).entity(buildJson(res,!res.equals("Success")))
+				.header("Access-Control-Allow-Origin", "*")
+				.header("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT")
+				.build();
 	}
 
 	@POST
-    @Path("/createDirectory")
+	@Path("/createDirectory")
 	@Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 	public Response createDirectory(@FormParam("email") String email, @FormParam("dirName") String dirName) {
 		String res = FileSystemInterface.createDirectory(email, dirName);
-		return Response.status(200).entity(buildJson(res,!res.equals("Success"))).build();
+		return Response.status(200).entity(buildJson(res,!res.equals("Success")))
+				.header("Access-Control-Allow-Origin", "*")
+				.header("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT")
+				.build();
 	}
 
 	@POST
-    @Path("/ls")
+	@Path("/ls")
 	@Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 	public Response ls(@FormParam("email") String email) {
 		String res = FileSystemInterface.ls(email);
-		return Response.status(200).entity(buildJson(res,res.equals(""))).build();
+		return Response.status(200).entity(buildJson(res,res.equals("")))
+				.header("Access-Control-Allow-Origin", "*")
+				.header("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT")
+				.build();
 	}
 
 	@POST
-    @Path("/cd")
+	@Path("/cd")
 	@Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 	public Response cd(@FormParam("email") String email, @FormParam("path") String path) {
 		String res = FileSystemInterface.changeWorkingDirectory(email, path);
-		return Response.status(200).entity(buildJson(res,!res.equals("Success"))).build();
+		return Response.status(200).entity(buildJson(res,!res.equals("Success")))
+				.header("Access-Control-Allow-Origin", "*")
+				.header("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT")
+				.build();
 	}
-	
+
 	private String buildJson(String data, boolean error) {
 		return "{\"data\":\"" + data + "\"," + "\"error\":" + error + "}";
 	}

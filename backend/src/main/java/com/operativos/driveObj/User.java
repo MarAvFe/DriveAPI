@@ -11,16 +11,16 @@ public class User {
 	private String wd;
 	private Directory root;
 	private ArrayList<SharedFile> sharedFiles;
-	
+
 	public User() {}
-	
+
 	public Directory getCurrentDirectory() {
 		String[] path = wd.split("/");
 		return getDirectory(root, path);
 	}
-	
+
 	private Directory getDirectory(Directory dir, String[] remainingPath) {
-		if (remainingPath.length == 1) return dir;
+		if (remainingPath.length < 2) return dir;
 		References r = dir.getContent().get(remainingPath[remainingPath.length-1]);
 		if(r != null) {
 			if (r.isDirectory()) {
@@ -91,8 +91,8 @@ public class User {
 		return "{\"email\":\"" + email + "\", \"pwd\":\"" + pwd + "\", \"driveSize\":" + driveSize + ", \"wd\":\"" + wd + "\", \"root\":" + root
 				+ ", \"sharedFiles\":[" + (strSharedFiles.equals("") ? "" : strSharedFiles.substring(0, strSharedFiles.length()-1)) + "]}";
 	}
-	
-	
-	
-	
+
+
+
+
 }
