@@ -61,6 +61,14 @@ class TreeExample extends React.Component {
         super(props);
         this.state = {};
         this.onToggle = this.onToggle.bind(this);
+        this.handleInputChange = this.handleInputChange.bind(this);
+        this.crefil = this.crefil.bind(this);
+        this.credir = this.credir.bind(this);
+        this.edit = this.edit.bind(this);
+        this.delet = this.delet.bind(this);
+        this.share = this.share.bind(this);
+        this.mov = this.mov.bind(this);
+        this.copy = this.copy.bind(this);
 
 		xDrive.ls("my@mail.com").then((response) => {
 			data = response.data;
@@ -77,9 +85,43 @@ class TreeExample extends React.Component {
         if(node.children){ node.toggled = toggled; }
         this.setState({ cursor: node });
     }
+    handleInputChange(event) {
+        const target = event.target;
+        const value = target.type === 'checkbox' ? target.checked : target.value;
+        const name = target.name;
+
+        this.setState({
+          [name]: value
+        });
+      }
+    crefil(){console.log("crefil:" + this.state.cre1 + ", " + this.state.cre2)}
+    credir(){console.log("credir:" + this.state.dir1)}
+    edit(){console.log("edit:" + this.state.edit)}
+    delet(){console.log("delete:" + this.state.delet)}
+    share(){console.log("share:" + this.state.share)}
+    mov(){console.log("move:" + this.state.mov)}
+    copy(){console.log("copy:" + this.state.copy)}
     render(){
         return (
 			<StyleRoot>
+            <div style={styles.component}>
+            <ul>
+            <li style={styles.actions} onClick={this.crefil}>Crear archivo (nombre | contenido)</li>
+                <input name="cre1" onChange={this.handleInputChange}></input>
+                <input name="cre2" onChange={this.handleInputChange}></input>
+            <li style={styles.actions} onClick={this.credir}>Crear directorio (nombre)</li>
+                <input name="dir1" onChange={this.handleInputChange}></input>
+            <li style={styles.actions} onClick={this.edit}>Editar (Nuevo nombre)</li>
+                <input name="edit" onChange={this.handleInputChange}></input>
+            <li style={styles.actions} onClick={this.delet}>Eliminar</li>
+            <li style={styles.actions} onClick={this.share}>Compartir (Email Destinatario)</li>
+                <input name="share" onChange={this.handleInputChange}></input>
+            <li style={styles.actions} onClick={this.mov}>Mover (Nueva Ruta)</li>
+                <input name="mov" onChange={this.handleInputChange}></input>
+            <li style={styles.actions} onClick={this.copy}>Copiar (Nueva Ruta)</li>
+                <input name="copy" onChange={this.handleInputChange}></input>
+            </ul>
+            </div>
 			<div style={styles.component}>
             	<Treebeard
                 	data={data}
