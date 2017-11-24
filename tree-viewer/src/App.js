@@ -42,8 +42,12 @@ class DataMiddleware extends React.Component{
 var currentViewer = null;
 class NodeViewer extends React.Component {
 	render() {
+		console.log("dayumDaniel");
+		console.log(this.viewerDialog);
         const style = styles.viewer;
-		if(this.props.node && this.props.node.content){
+		if(this.props.priority){
+			currentViewer = this.props.dialog;
+		}else if(this.props.node && this.props.node.content){
 			currentViewer = (<div style={style.base}>
 				<div>Size: {this.props.node.size}</div>
 				<div>Creation date: {this.props.node.creationDate}</div>
@@ -54,6 +58,8 @@ class NodeViewer extends React.Component {
 			currentViewer = (<div style={style.base}>
 				<div>Size: {this.props.node.size}</div>
 			</div>);
+		}else{
+			currentViewer = null;
 		}
 		return currentViewer;
         //let location = this.props.node && this.props.node.parent  ? this.props.node.parent + this.props.node.name : "";
@@ -69,20 +75,37 @@ var data = {
 	loading: true
 }
 
+//class Move extends React.Component {
+//	render(){
+//		return (
+//			<div>
+//				<div>Seleccione la carpeta de destino</div>
+//				<button type="button">Mover</button>
+//			</div>
+//		)
+//	}
+//}
+
 class TreeExample extends React.Component {
     constructor(props){
         super(props);
         this.state = {};
         this.onToggle = this.onToggle.bind(this);
         this.handleInputChange = this.handleInputChange.bind(this);
+        this.refresh = this.refresh.bind(this);
         this.crefil = this.crefil.bind(this);
         this.credir = this.credir.bind(this);
         this.edit = this.edit.bind(this);
         this.delet = this.delet.bind(this);
         this.share = this.share.bind(this);
         this.mov = this.mov.bind(this);
+        this.requestMove = this.requestMove.bind(this);
+        this.cancel = this.cancel.bind(this);
         this.copy = this.copy.bind(this);
 
+		this.refresh();
+    }
+	refresh(){
 		xDrive.ls("my@mail.com").then((response) => {
 			data = response.data;
 			data.toggled = true;
@@ -90,8 +113,7 @@ class TreeExample extends React.Component {
 			this.forceUpdate();
 			console.log(data);
 		});
-
-    }
+	}
     onToggle(node, toggled){
 		if(this.state.cursor){this.state.cursor.active = false};
         node.active = true;
@@ -112,8 +134,24 @@ class TreeExample extends React.Component {
     edit(){console.log("edit:" + this.state.edit)}
     delet(){console.log("delete:" + this.state.delet)}
     share(){console.log("share:" + this.state.share)}
-    mov(){console.log("move:" + this.state.mov)}
-    copy(){console.log("copy:" + this.state.copy)}
+    mov(){
+		let viewerDialog = (
+			<div>
+				<div>Seleccione la carpeta de destino</div>
+				<button type="button" class="btn" onClick={this.requestMove}>Mover</button>
+				<button type="button" class="btn" onClick={this.cancel}>Cancelar</button>
+			</div>
+		);
+		this.setState({ priority: true, dialog: viewerDialog });
+	}
+	requestMove(){
+
+	}
+    copy(){console.log("copy:" + this.state.copy);}
+	cancel(){
+		console.log("whoa");
+		this.setState({ priority: false});
+	}
     render(){
         return (
 			<StyleRoot>
@@ -130,7 +168,6 @@ class TreeExample extends React.Component {
             <li style={styles.actions} onClick={this.share}>Compartir (Email Destinatario)</li>
                 <input name="share" onChange={this.handleInputChange}></input>
             <li style={styles.actions} onClick={this.mov}>Mover (Nueva Ruta)</li>
-                <input name="mov" onChange={this.handleInputChange}></input>
             <li style={styles.actions} onClick={this.copy}>Copiar (Nueva Ruta)</li>
                 <input name="copy" onChange={this.handleInputChange}></input>
             </ul>
@@ -143,7 +180,7 @@ class TreeExample extends React.Component {
             	/>
 			</div>
 			<div style={styles.component}>
-            	<NodeViewer node={this.state.cursor}/>
+            	<NodeViewer node={this.state.cursor} priority={this.state.priority} dialog={this.state.dialog}/>
 			</div>
 			</StyleRoot>
         );
