@@ -39,11 +39,24 @@ class DataMiddleware extends React.Component{
 	}
 }
 
+var currentViewer = null;
 class NodeViewer extends React.Component {
 	render() {
         const style = styles.viewer;
-        let location = this.props.node && this.props.node.parent  ? this.props.node.parent + this.props.node.name : "";
-        return <div>{location}</div>;
+		if(this.props.node && this.props.node.content){
+			currentViewer = (<div style={style.base}>
+				<div>Size: {this.props.node.size}</div>
+				<div>Creation date: {this.props.node.creationDate}</div>
+				<div>Modification date: {this.props.node.modificationDate}</div>
+				<div>Content: {this.props.node.content}</div>
+			</div>);
+		}else if(this.props.node && this.props.node.isDir){
+			currentViewer = (<div style={style.base}>
+				<div>Size: {this.props.node.size}</div>
+			</div>);
+		}
+		return currentViewer;
+        //let location = this.props.node && this.props.node.parent  ? this.props.node.parent + this.props.node.name : "";
     }
 }
 NodeViewer.propTypes = {
@@ -80,10 +93,10 @@ class TreeExample extends React.Component {
 
     }
     onToggle(node, toggled){
-        if(this.state.cursor){this.state.cursor.active = false;}
+		if(this.state.cursor){this.state.cursor.active = false};
         node.active = true;
+		this.setState({ cursor: node });
         if(node.children){ node.toggled = toggled; }
-        this.setState({ cursor: node });
     }
     handleInputChange(event) {
         const target = event.target;
