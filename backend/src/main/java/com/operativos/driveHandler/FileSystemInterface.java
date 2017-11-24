@@ -22,30 +22,30 @@ import com.operativos.driveObj.SharedFile;
 import com.operativos.driveObj.User;
 
 public class FileSystemInterface {
-	
+
 	static String driveName = System.getProperty("user.dir") + "/drive.xml";
 	static int consecutiveFile = 1;
-	
+
 	public static void createDrive() {
 		ArrayList<User> users = new ArrayList<User>();
 		saveDrive(users);
 	}
-	
+
 	public static String addUser(String email, String pwd, int driveSize) {
 		ArrayList<User> users = FileSystemInterface.readDrive();
-		
+
 		for (User user : users) {
 			if(user.getEmail().equals(email)) {
 				return "Duplicate user";
 			}
 		}
-		
+
 		Directory root = new Directory();
 		root.setName("root");
 		root.setSize(0);
 		root.setContent(new HashMap<>());
 		root.setParent(null);
-		
+
 		User u = new User();
 		u.setEmail(email);
 		u.setPwd(pwd);
@@ -57,7 +57,7 @@ public class FileSystemInterface {
 		saveDrive(users);
 		return "Success";
 	}
-	
+
 	public static boolean login(String email, String pwd) {
 		ArrayList<User> users = FileSystemInterface.readDrive();
 		for (User user : users) {
@@ -67,7 +67,7 @@ public class FileSystemInterface {
 		}
 		return false;
 	}
-	
+
 	public static String createFile(String userEmail, String name, String content) {
 		DriveFile f = new DriveFile();
 		f.setId(consecutiveFile);
@@ -77,13 +77,13 @@ public class FileSystemInterface {
 		f.setCreationDate(new Date());
 		f.setModificationDate(new Date());
 		f.setContent(content);
-		
+
 		ArrayList<User> users = FileSystemInterface.readDrive();
 		for (User user : users) {
 			if(user.getEmail().equals(userEmail)) {
 				if(user.getRoot().getSize() + f.getSize() < user.getDriveSize() ) {
 					user.getCurrentDirectory().getContent().put(name,f);
-					user.getCurrentDirectory().updateSize();					
+					user.getCurrentDirectory().updateSize();
 				}else {
 					return "Not enough space for new file.";
 				}
@@ -92,8 +92,8 @@ public class FileSystemInterface {
 		saveDrive(users);
 		return "Success";
 	}
-	
-	public static String modifyFile(String userEmail, String name, String content) {		
+
+	public static String modifyFile(String userEmail, String name, String content) {
 		ArrayList<User> users = FileSystemInterface.readDrive();
 		for (User user : users) {
 			if(user.getEmail().equals(userEmail)) {
@@ -111,8 +111,8 @@ public class FileSystemInterface {
 		saveDrive(users);
 		return "Success";
 	}
-	
-	public static String deleteFile(String userEmail, String name) {		
+
+	public static String deleteFile(String userEmail, String name) {
 		ArrayList<User> users = FileSystemInterface.readDrive();
 		boolean found = false;
 		for (User user : users) {
@@ -134,8 +134,8 @@ public class FileSystemInterface {
 		saveDrive(users);
 		return "Success";
 	}
-	
-	public static String shareFile(String userEmail, String fileName, String theirEmail) {		
+
+	public static String shareFile(String userEmail, String fileName, String theirEmail) {
 		ArrayList<User> users = FileSystemInterface.readDrive();
 		boolean themFound = false, fileFound = false;
 		for (User user : users) {
@@ -165,13 +165,13 @@ public class FileSystemInterface {
 		saveDrive(users);
 		return "Success";
 	}
-	
+
 	public static String createDirectory(String userEmail, String name) {
 		Directory d = new Directory();
 		d.setName(name);
 		d.setSize(0);
 		d.setContent(new HashMap<>());
-		
+
 		ArrayList<User> users = FileSystemInterface.readDrive();
 		for (User user : users) {
 			if(user.getEmail().equals(userEmail)) {
@@ -183,7 +183,7 @@ public class FileSystemInterface {
 		saveDrive(users);
 		return "Success";
 	}
-	
+
 	public static String ls(String userEmail) {
 		ArrayList<User> users = FileSystemInterface.readDrive();
 		for (User user : users) {
@@ -193,43 +193,36 @@ public class FileSystemInterface {
 		}
 		return "";
 	}
-	
+
 	public static String changeWorkingDirectory(String userEmail, String path) {
-		if(path.equals(".")) return "Success";
 		ArrayList<User> users = FileSystemInterface.readDrive();
+		boolean dirExists = false;
 		for (User user : users) {
 			if(user.getEmail().equals(userEmail)) {
-				String newWd;
-				String[] p;
-				boolean dirExists = false;
-				if(path.equals("..")) {
-					newWd = user.getWd();
-					if(newWd.equals("root")) return "Can't go over root.";
-					p = newWd.split("/");
-					String[] tmp = Arrays.copyOfRange(p, 0, p.length-1);
-					newWd = tmp[0];
-					for (int i = 1; i < tmp.length; i++) {
-						newWd += "/";
-						newWd += tmp[i];
-					}
+				if(existsPath(path,user.getRoot())) {
+					user.setWd(path);
 					dirExists = true;
-				}else{
-					path = "/" + path;
-					newWd = user.getWd() + path;
-					p = newWd.split("/");
-					References r = user.getCurrentDirectory().getContent().get(p[p.length-1]); 
-					if (r.isDirectory()) {
-						if(((Directory)r).getName().equals(p[p.length-1])) {
-							dirExists = true;
-						}
-					}
-				};
-				if(!dirExists) return "Directory not found.";
-				user.setWd(newWd);
+				}
 			}
 		}
+		if(!dirExists) return "Invalid directory.";
 		saveDrive(users);
 		return "Success";
+	}
+
+	private static boolean existsPath(String path, Directory root) {
+		if(path.equals("/")) return true;
+		String[] p;
+		p = path.split("/");
+		return pathDepth(Arrays.copyOfRange(p,1,p.length), root);
+	}
+
+	private static boolean pathDepth(String[] path, Directory dir) {
+		if(path[0].length() == 0) return true;
+		if(dir.getReference(path[0]) == null) return false;
+		if(!dir.getReference(path[0]).isDirectory()) return false;
+		if(path.length == 1) return true;
+		return true & pathDepth(Arrays.copyOfRange(path,1,path.length), (Directory)dir.getReference(path[0]));
 	}
 
 	private static void saveDrive(ArrayList<User> users){
