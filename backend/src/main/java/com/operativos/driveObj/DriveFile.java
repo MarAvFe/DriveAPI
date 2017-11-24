@@ -11,7 +11,7 @@ public class DriveFile implements References{
 	private Date creationDate;
 	private Date modificationDate;
 	private String content;
-	
+
 	public DriveFile() {}
 
 	public int getId() {
@@ -77,9 +77,9 @@ public class DriveFile implements References{
 
 	@Override
 	public String toString() {
-		return "{\"id\":\"" + id + "\", \"name\":\"" + name + "\", \"size\":" + size + ", \"extension\":\"" + extension + "\",\"creationDate\":\""
+		return "{\"fileId\":\"" + id + "\", \"name\":\"" + name + "\", \"size\":" + size + ", \"extension\":\"" + extension + "\",\"creationDate\":\""
 				+ creationDate + "\", \"modificationDate\":\"" + modificationDate + "\", \"content\":\"" + content + "\", \"isDir\":false}";
 	}
-	
-	
+
+
 }

@@ -170,7 +170,8 @@ public class DriveAPI {
 	}
 
 	private String buildJson(String data, boolean error) {
-		return "{\"data\":\"" + data + "\"," + "\"error\":" + error + "}";
+		data = data.contains("{") ? data : "\"" + data + "\"";
+		return "{\"data\":" + data + "," + "\"error\":" + error + "}";
 	}
 
 }

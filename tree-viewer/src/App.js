@@ -10,41 +10,9 @@ import {Treebeard, decorators} from 'react-treebeard';
 import xDrive from './services';
 
 
-// Test data
-const data = {
-    name: 'root',
-    toggled: true,
-    children: [
-        {
-            name: 'parent',
-            children: [
-                { name: 'child1' },
-                { name: 'child2' }
-            ]
-        },
-        {
-            name: 'loading parent',
-            loading: true,
-            children: []
-        },
-        {
-            name: 'parent',
-            children: [
-                {
-                    name: 'nested parent',
-                    children: [
-                        { name: 'nested child 1' },
-                        { name: 'nested child 2' }
-                    ]
-                }
-            ]
-        }
-    ]
-};
-
 // Example: Customising The Header Decorator To Include Icons
 decorators.Header = ({style, node}) => {
-    const iconType = node.children ? 'folder' : 'file-text';
+    const iconType = node.isDir ? 'folder' : 'file-text';
     const iconClass = `fa fa-${iconType}`;
     const iconStyle = {marginRight: '5px'};
 
@@ -60,9 +28,10 @@ decorators.Header = ({style, node}) => {
 
 class DataMiddleware extends React.Component{
 	static addParents(node){
+		if(node.content){return};
 		for(let i = 0; i< node.children.length; i++){
 			node.children[i].parent = node.parent ? node.parent + node.name + "/": node.name + "/";
-			if (node.children[i].children) {this.addParents(node.children[i])};
+			if (node.children[i].children && node.children[i].isDir) {this.addParents(node.children[i])};
 		}
 	}
 	static json(data){
@@ -72,26 +41,37 @@ class DataMiddleware extends React.Component{
 
 class NodeViewer extends React.Component {
 	render() {
-		xDrive.ls();
-		DataMiddleware.json(data);
         const style = styles.viewer;
-        let content = this.props.node ? this.props.node.parent + this.props.node.name : "";
-        return <div>{content}</div>;
+        let location = this.props.node && this.props.node.parent  ? this.props.node.parent + this.props.node.name : "";
+        return <div>{location}</div>;
     }
 }
 NodeViewer.propTypes = {
     node: PropTypes.object
 };
+var data = {
+    name: '/',
+    toggled: true,
+    content: [],
+	loading: true
+}
 
 class TreeExample extends React.Component {
     constructor(props){
         super(props);
         this.state = {};
         this.onToggle = this.onToggle.bind(this);
+
+		xDrive.ls("my@mail.com").then((response) => {
+			data = response.data;
+			data.toggled = true;
+			DataMiddleware.json(data);
+			this.forceUpdate();
+			console.log(data);
+		});
+
     }
     onToggle(node, toggled){
-		console.log(node);
-		console.log(toggled);
         if(this.state.cursor){this.state.cursor.active = false;}
         node.active = true;
         if(node.children){ node.toggled = toggled; }

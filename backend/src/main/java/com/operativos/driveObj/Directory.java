@@ -11,8 +11,8 @@ public class Directory implements References{
 	private int size;
 	private Map<String,References> content;
 	private Directory parent;
-	
-	
+
+
 	public Directory() {
 		this.content = new HashMap<String, References>();
 	}
@@ -32,7 +32,7 @@ public class Directory implements References{
 	public void setSize(int size) {
 		this.size = size;
 	}
-	
+
 	public void updateSize() {
 		Map<String, References> map = this.content;
 		int nuSize = 0;
@@ -58,11 +58,11 @@ public class Directory implements References{
 	public void setContent(Map<String,References> content) {
 		this.content = content;
 	}
-	
+
 	public References getReference(String key) {
 		return this.content.get(key);
 	}
-	
+
 	public void setReference(String key, References value) {
 		this.content.put(key, value);
 	}
@@ -74,7 +74,7 @@ public class Directory implements References{
 	public void setParent(Directory parent) {
 		this.parent = parent;
 	}
-	
+
 	public String getPath() {
 		if(parent == null) return "root";
 		String parentPath = parent.getPath();
@@ -101,10 +101,10 @@ public class Directory implements References{
 				strContent += d.toString() + ",";
 			}
 		}
-		return "{\"name\":\"" + name + "\",\"size\":" + size + ",\"content\":[" + 
+		return "{\"name\":\"" + name + "\",\"size\":" + size + ",\"children\":[" +
 			(strContent.equals("") ? "" : strContent.substring(0, strContent.length()-1)) + "], \"isDir\":true}";
 	}
-	
-	
+
+
 
 }
