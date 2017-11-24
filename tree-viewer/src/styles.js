@@ -11,6 +11,10 @@ export default {
             display: 'block'
         }
     },
+    actions: {
+        cursor: 'pointer',
+        color: '#0088ff',
+    },
     searchBox: {
         padding: '20px 20px 0 20px'
     },
